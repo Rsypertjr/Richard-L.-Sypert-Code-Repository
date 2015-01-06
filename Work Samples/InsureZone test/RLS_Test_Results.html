@@ -1,0 +1,817 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ 
+<HEAD>  <!-- HEAD Section Beginning -->
+<TITLE> New Document </TITLE>
+<META NAME="Generator" CONTENT="EditPlus">
+<META NAME="Author" CONTENT="">
+<META NAME="Keywords" CONTENT="">
+<META NAME="Description" CONTENT="">
+
+
+<script type="text/javascript">   // Begin Java Function script
+function insRow(frm)   // Insert Row Function
+{
+  try
+    {var tbl = document.getElementById('myTable');
+	}
+    catch (e)
+    {Console.WriteLine(e.Message);
+    };
+
+    var c1 = frm.c1Val.value;    
+	var c2 = frm.c2Val.value;
+	
+		var tr = tbl.insertRow(nRows);
+ 		xmlViewText[nRows] = "row" + String(nRows) + "xmlView";
+		
+        for (var i=0;i<3;i++)
+		{
+          var td=document.createElement('td');
+				  				   				   
+		  if(i<2)
+		  {   
+		    if(i==0)
+			{
+			  cell1Names[nRows] = "row" + String(nRows) + "Cell" + String(i);
+              var cellstr = cell1Names[nRows];
+              tr.appendChild(td);
+	        }
+		    else if(i==1)
+		    {
+			  cell2Names[nRows] = "row" + String(nRows) + "Cell" + String(i);
+              var cellstr = cell2Names[nRows];
+              tr.appendChild(td);
+	        }
+		    else;
+					
+		 td.innerHTML = '<input type="text" name=cellstr ></input>';
+		 td.id = cellstr;
+                       
+		 } // end if (i<2)
+		 else if (i>=2)
+		 {
+				   
+		   td.innerHTML = '<input type="button" name=cellstr " value="Delete">';
+		   delCell = "Delete" + String(nRows);
+           var cellstr = delCell;
+		   td.id = cellstr;
+           tr.appendChild(td);
+		   td.onclick=function()
+		   {
+             var drow = td.parentNode.rowIndex;
+			 delRow(drow);
+			 if(createXML == "true")
+			   xmlView();
+		   }
+		 }   // end else if
+			  else;
+	    }  // end for
+         
+        var c1 = String(frm.c1Val.value);
+	    var c2 = String(frm.c2Val.value);
+	    try
+	    {
+	      var nxc1 = document.getElementById(cell1Names[nRows]);
+          var nxc2 = document.getElementById(cell2Names[nRows]);
+	    }
+	    catch (e)
+	    {Console.WriteLine(e.Message);
+	    }
+	 
+	    frm.c1Val.value = "";
+        frm.c2Val.value = "";
+        var c11 = c1;
+        var c22 = c2;
+        nxc1.innerHTML = c11;
+        nxc2.innerHTML = c22; 
+		var tRw = new tableRow(c11,c22);
+	    tRows[nRows] = tRw;
+        initSortTable(nRows, c11, c22);
+		
+
+        nRows+=1;
+	 // }      
+}  // End Insert Row Function
+     
+   
+
+
+//----------------------------------------------------------------------------
+
+function delRow(drow)   // Delete Row Function
+{
+  var drw = Number(drow);
+  var x = document.getElementById('myTable').deleteRow(drw); 
+  //delete row
+  nRows-=1;
+}  // End Delete Row Function
+
+//----------------------------------------------------------------------------
+
+function xmlView()     // XML Document View function
+{
+  try
+  {
+  var y = document.getElementById('xmlView');
+  var tbl = document.getElementById('myTable');
+  }
+  catch (e)
+  {
+    Console.WriteLine(e.Message);
+  }
+ 
+  createXML = "true";
+
+     // clear out XML View
+  y.innerText = "";
+  
+  var htxt = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?> \n \n";
+  txt = "";
+
+
+  for (i=0;i<nRows;i++ )      //  refill XMLView with changed Table contents
+  { 
+    var cell = tbl.rows[i].cells;
+	var tx = "\n  <tr>\n    <td1>" + cell[0].innerHTML + "</td1>\n    <td2>" + cell[1].innerHTML + "</td2>\n  </tr>\n";
+    txt = txt + tx;
+  }
+	var z = y.innerText = htxt + "<table>" + txt + "</table>";
+    // write XML String (not File)
+   
+
+  xmlText = z;  // save xml Text String
+ 
+
+  txt = "";
+  
+ }  //end function xmlView()
+//---------------------------------------------------------------------------------
+
+function sortNumber(a,b)  //for array sort
+  {
+    return a - b;
+  }
+//-----------------------------------------------------------------------------
+function xml_Sort()   // XML Sort View function
+{
+  try
+    { 
+       var y = document.getElementById('xmlSortView'); 
+      
+       
+    }
+  catch (e)
+    {
+       Console.WriteLine(e.Message);
+    }
+
+  // create xsl document
+  var xslTextL = new Array(); 
+  xslTextL[0] = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?> \n";
+  xslTextL[1] = "<xsl:stylesheet version=\"1.0\" \n";
+  xslTextL[2] = "xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"> \n";
+  xslTextL[3] = "<xsl:template match=\"/\"> \n";
+  xslTextL[4] = "<html>\n";
+  xslTextL[5] = "  <body>\n";
+  xslTextL[6] = "    <table>\n";
+  xslTextL[7] = "      <xsl:for-each select=\"table/tr\"> \n"; 
+  xslTextL[8] = "        <xsl:sort select=\"td1\" data-type=\"number\"/> \n";
+  xslTextL[9] = "        <xsl:sort select=\"td2\" data-type=\"text\"/> \n";
+  xslTextL[10] = "         <tr> \n";
+  xslTextL[11] = "           <td1><xsl:value-of select=\"td1\"/></td1> \n";
+  xslTextL[12] = "           <td2><xsl:value-of select=\"td2\"/></td2> \n";
+  xslTextL[13] = "         </tr> \n";
+  xslTextL[14] = "     </xsl:for-each>\n"; 
+  xslTextL[15] = "   </table>\n";
+  xslTextL[16] = "  </body>\n";
+  xslTextL[17] = "</html>\n";
+  xslTextL[18] = "</xsl:template> \n";
+  xslTextL[19] = "</xsl:stylesheet> \n";
+
+
+  var xslText = "";
+  for (i=0;i<20;i++ )  // build xslt file text string
+  {
+    xslText = xslText + xslTextL[i];
+  }
+
+  var z = xslText;
+  alert("XSLT FILE: \n\n" + z);  // Show XSLT Text String
+ 
+   xslFileName = "xslFile.xsl";    // Create xsl File
+   xslFN = "xslFile.xsl";
+   createFile(z,fileDir,xslFN);
+		             
+   var xText = document.getElementById("xmlView");  // Open xml view div
+   var xmText = xText.innerText;  // Get xml text string
+		   
+
+   xmlFileName = "xmlFile.xml";   // Create xml File
+   xmlFN = "xmlFile.xml";
+   createFile(xmText,fileDir,xmlFN);
+
+   var xmlRef = new ActiveXObject("Microsoft.XMLDOM");  // Load DOM for xml File
+   xmlRef.async="false";
+   var ck = xmlRef.load(fileDir+xmlFileName);
+   
+   var xslRef=new ActiveXObject("Microsoft.XMLDOM");  // Load DOm for xsl File
+   xslRef.async="false";
+   var ck = xslRef.load(fileDir+xslFileName);
+   var result = xmlRef.transformNode(xslRef);
+   y.innerText = result; 
+
+}
+//------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------
+function createRequest(dname, handler) {
+if(window.XMLHttpRequest) {
+req = new XMLHttpRequest();
+} else if(window.ActiveXObject) {
+req = new ActiveXObject("Microsoft.XMLHTTP");
+} else {
+alert("Your browser does not support XML HTTP requests! Please switch to a different browser before using this website.");
+return false;
+}
+req.onload = handler;
+req.open("GET", dname, false);
+req.send(null);
+if(req.status == 0)
+   dump(req.responseText);
+else
+    return req.responseText;
+}
+
+//-------------------------------------------------------------------------
+function myHandler() {
+alert("Hi! We got our request back!");
+}
+
+//------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
+
+function initCols()   // Initialize Tables function - Not Used
+{
+  for(i=0;i<50;i++)
+  { 
+    txCells[0] = 0;
+	txCells[1] = 0;
+    txRows[i] = txCells;
+  }
+}
+//--------------------------------------------------------------------------
+
+function JAVASort()  // Java Sort Table Columns function 
+{
+  if (nRows >2)
+  {
+  
+    var slst = document.getElementById('sortedTableListTitle');
+    var slt = document.getElementById('sortListTable');
+    var cl1 = new Array(50);
+    var cl2 = new Array(50);
+	var numArr1 = new Array(50);
+    var numArr2 = new Array(50);
+	var strArr1 = new Array(50);
+    var strArr2 = new Array(50);
+	var numct = 0;
+	var strct = 0;
+	var temp = 0;
+  
+    slst.innerHTML =  "Java Sorted Table";
+  
+    java_Sort = "true";
+    for(i=0;i<nRows;i++)
+	{
+    cl1[i] = tRows[i].getCell1();
+	cl2[i] = tRows[i].getCell2();
+
+	if( (parseInt(cl1[i])) && (parseInt(cl1[i]))) // Get number or string input 
+	  {
+	  
+	  numArr1[numct] = cl1[i];
+      numArr2[numct] = cl2[i];
+	  numct = numct + 1;
+	  }
+	else 
+	  {
+	  strArr1[strct] = cl1[i];
+      strArr2[strct] = cl2[i];
+ 	  strct = strct + 1;
+	  }
+	
+	}
+    
+	// Get VB Sorted Array
+
+	cl1.sort(sortNumber);
+	cl2.sort(sortNumber);
+	numArr1.sort(sortNumber);
+    numArr2.sort(sortNumber);
+	strArr1.sort();
+	strArr2.sort();
+    
+ 
+    if((strct > 0) && (numct==0))  // Output only strings
+	{
+      for(i=0;i<strct;i++)
+	  {
+	    var cells = slt.rows[i].cells;
+    	tRows[i].cell1 = strArr1[i];
+	    cells[0].innerHTML = strArr1[i];
+	    tRows[i].cell2 = strArr2[i];
+        cells[1].innerHTML = strArr2[i];
+	  } 
+
+    }
+	else if((numct>0) && (strct>0))   // Output nums and strings
+	{
+      for(i=0;i<numct;i++)
+	  {
+        var cells = slt.rows[i].cells;
+	    tRows[i].cell1 = numArr1[i];
+	    cells[0].innerHTML = numArr1[i];
+	    tRows[i].cell2 = numArr2[i];
+        cells[1].innerHTML = numArr2[i];
+	  } 
+
+      for(i=numct;i<nRows;i++)
+	  {
+	    var cells = slt.rows[i].cells;
+    	tRows[i].cell1 = strArr1[i-numct];
+	    cells[0].innerHTML = strArr1[i-numct];
+	    tRows[i].cell2 = strArr2[i-numct];
+        cells[1].innerHTML = strArr2[i-numct];
+	  } 
+	}
+    else if((numct>0) && (strct==0))   // Output numbers only
+	{
+    for(i=0;i<numct;i++)
+	  {
+        var cells = slt.rows[i].cells;
+	    tRows[i].cell1 = numArr1[i];
+	    cells[0].innerHTML = numArr1[i];
+	    tRows[i].cell2 = numArr2[i];
+        cells[1].innerHTML = numArr2[i];
+	  } 
+	}
+    else;
+  }
+  else
+    alert("Please input at Least 3 Rows!");
+}  //end function JAVASort()
+
+//----------------------------------------------------------------------
+function tableRow(cell1, cell2)
+{
+  this.cell1 = cell1;
+  this.cell2 = cell2;
+  this.getCell1 = function(){return this.cell1;};
+  this.getCell2 = function(){return this.cell2;};
+}
+
+
+//------------------------------------------------------------------------
+
+
+
+function initSortTable(nRows, c1, c2)  // Initialze Tables function
+{
+  var tbl2 = document.getElementById('sortListTable');
+  var tr = tbl2.insertRow(nRows);
+  for(j=0;j<2;j++)
+  {
+    var td = document.createElement('td');
+    if(j==0)
+	{
+	  td.innerHTML = c1;
+      var str = "slRow" + String(nRows) + "Cell1";
+	  sl1CellNames[nRows] = str;
+	}
+	else if(j>0)
+    {
+	  td.innerHTML =  c2;
+      var str = "slRow" + String(nRows) + "Cell2";
+      sl2CellNames[nRows] = str;
+	}
+	else;
+    td.id = str;
+    tr.appendChild(td);}
+}  // End Initialize tables
+
+
+function getJavaCol1ArrayElement(index) // get entries for vb sort
+{
+  alert( index);
+  return tRows[index][0];
+
+}
+
+function getJavaCol2ArrayElement(index)  // ditto
+{
+  return tRows[index][1];
+}
+
+function sendNRows()  //send number of row to VB
+{
+  return nRows;
+}
+
+function jvClearSort()  //  Clear Table Row
+{
+   var slst = document.getElementById('sortListTable');
+   document.getElementById('sortListTable').deleteRow(0);
+}
+
+function jvInitSort()      // (Re)- Intialize Sort Table with zeros for redo of                               //sorts
+{
+  for(i=0;i<nRows;i++)
+     initSortTable(i,"0", "0");
+}
+
+function cntRows()
+{
+ctRows = ctRows + 1;
+if (ctRows == nRows)
+   ctRows = 1;
+else 
+   return ctRows;
+
+return nRows;
+}
+</script>   <!-- End Java Function script  -->
+<!-------------------------------------------------------------------------->
+
+
+<!------------------------------------------------------------------------>
+<script type="text/vbscript">  'Beginning of Visual Basic Script Section
+
+Dim nRows     'VB Global Variables
+tRows = Array()
+tRws = Array()
+tCells = Array()
+cells = Array()
+numRws = Array()
+nmRows = Array()
+strRws = Array()
+stRows = Array()
+'-------------------------------------------------------------------------------
+
+function VBSort()  'Visual Basic Sort function
+Dim Tbl, Row, Cell1,Cell0, tv, Count, tval0,tval1, i, j, k,l,m,n, up, i1val, j1val, i0val, j0val,numCt, strCt
+
+  nRows = getNRows()
+  ReDim cells(2)
+  ReDim numRws(nRows)
+  ReDim strRws(nRows)
+  numCt = 0
+  strCt = 0
+
+Set t1Rows=document.getElementById("myTable").rows
+Set tbl2=document.getElementById("sortListTable").rows
+Set slst = document.getElementById("sortedTableListTitle")
+
+slst.innerHTML = "VB Sorted Table"   
+nRows = getNRows()
+
+If nRows>2 Then
+  ReDim tCells(2)
+  
+
+  For j=0 To (nRows-1)   'Get vals and split them between num and string
+    tCells(0) = CStr(t1Rows(j).cells(0).innerHTML)
+    tCells(1) = CStr(t1Rows(j).cells(1).innerHTML)
+
+    If (IsNumeric(tCells(0)) And IsNumeric(tCells(1))) Then
+	  numRws(numCt) = tCells
+      numCt = numCt + 1
+    Else 
+	 strRws(strCt) = tCells
+     strCt = strCt + 1
+	
+	End If
+  Next
+  
+  ReDim nmRows(numCt)
+  ReDim stRows(strCt)
+  ReDim tRows(numCt)
+  ReDim tRws(strCt)
+
+  For i = 0 To numCt-1    'Reduce arrays to actual size 
+    nmRows(i) = numRws(i)
+  Next
+  For j = 0 To strCt-1
+    stRows(j) = strRws(j)
+  Next
+  
+  If ((strCt > 0) And (numCt=0)) Then  'Sort separate string and number arrays
+       tRws = sortArray(stRows,strCt)
+  ElseIf ((numCt>0) And (strCt=0)) Then
+       tRows = sortArray(nmRows,numCt)
+  ElseIf ((numCt>0) And (strCt>0)) Then
+       tRows = sortArray(nmRows,numCt)
+	   tRws = sortArray(stRows,strCt)
+  Else
+  End If
+
+
+ If(numCt>0) Then    '  Fill Sort Table
+    For l = 0 To numCt-1
+      tbl2(l).cells(0).innerHTML  = tRows(l)(0) 
+      tbl2(l).cells(1).innerHTML  = tRows(l)(1)
+    Next
+  End If
+  
+  If(strCt>0) Then
+    For m = numCt To nRows-1
+      tbl2(m).cells(0).innerHTML  = tRws(m-numCt)(0) 
+      tbl2(m).cells(1).innerHTML  = tRws(m-numCt)(1)
+	Next
+  End If
+Else 
+  alert("Please input at Least 3 Rows!")
+End If
+end Function   ' End Visual Basic function
+'------------------------------------------------------------------------------
+
+Function sortArray(vbArr,indexcnt)   'Begin Sort Array function
+Dim i,j,k, cnt, temp1, temp2
+
+numCt = 0
+strCt = 0
+If (IsNumeric(vbArr(0)(1)) And IsNumeric(vbArr(0)(0)))Then
+  For k = 0 To 1
+    For j = 0 To (indexcnt-1)
+      For i=indexcnt-2 To j Step -1
+         If (CLng(vbArr(i)(k)) > CLng(vbArr(i+1)(k))) Then
+           temp1 = vbArr(i)(k)
+           vbArr(i)(k) = vbArr(i+1)(k)
+	       vbArr(i+1)(k) = temp1
+         End If
+       Next
+	 Next
+  Next
+Else
+  For k = 0 To 1
+    For j = 0 To (indexcnt-1)
+	  For i=indexcnt-2 To j Step -1
+	    If (StrComp(( vbArr(i)(k) ), ( vbArr(i+1)(k) ))=1) Then
+          temp1 = vbArr(i)(k)
+          vbArr(i)(k) = vbArr(i+1)(k)
+	      vbArr(i+1)(k) = temp1
+	    End If
+      Next
+    Next
+  Next
+End If
+
+sortArray = vbArr
+End Function     'End Sort Array function
+
+
+Function getVBCol1SortedArray(Row)   'Not Used
+  getVBCol1SortedArray = tRows(Row)(0)
+End Function
+'------------------------------------------------------------------------------
+Function getVBCol2SortedArray(Row)   'Not Used
+  getVBCol2SortedArray = tRows(Row)(1)
+End Function
+'--------------------------------------------------------------------------------
+
+Function getNRows()     'Get number of rows from Java
+  getNRows= sendNRows()
+End Function
+'----------------------------------------------------------------------------
+Function getStrings(str1,str2)  'Send string form Java to VB
+alert(str1 & " ' " & str2)
+End Function
+
+'----------------------------------------------------------------------------
+Function stringCompare(str1, str2)   'Java use VB String Compare
+  Dim cmp
+  cmp = StrComp(CStr(str1),CStr(str2))
+  stringCompare = cmp
+End Function
+'------------------------------------------------------------------------------
+Function initVBGlobals() 'Not Used - was for JAVA Sort- called from JavaScript 
+  Dim i,j
+  vbArr = Array()
+  nRows = getNRows()
+  
+  ReDim tCells(2)
+  ReDim tRows(nRows)
+  ReDim vbArr(nRows)
+
+
+  For i = 0 To nRows-1
+    If i = 0 Then
+      tCells(0) =  getJavaCol1ArrayElement(i)
+      tCells(1) =  getJavaCol2ArrayElement(i)
+	Else 
+	  j = cntRows()-1
+	  tCells(0) =  getJavaCol1ArrayElement(j)
+      tCells(1) =  getJavaCol2ArrayElement(j)
+   	End If
+	vbArr(i) = tCells
+	
+  Next
+  
+  tRows = sortArray(vbArr,nRows)
+End Function
+'-----------------------------------------------------------------------------
+Function createFile(strText, strDirectory, strFile)  ' used for creating xml and xsl files from Java
+
+Dim objFSO, objFolder, objShell, objTextFile, objFile
+
+' Create the File System Object
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+' Check that the strDirectory folder exists
+If objFSO.FolderExists(strDirectory) Then
+   Set objFolder = objFSO.GetFolder(strDirectory)
+Else
+   Set objFolder = objFSO.CreateFolder(strDirectory)
+  ' WScript.Echo "Just created " & strDirectory
+End If
+
+If objFSO.FileExists(strDirectory & strFile) Then
+   Set objFolder = objFSO.GetFolder(strDirectory)
+Else
+   Set objFile = objFSO.CreateTextFile(strDirectory & strFile)
+   'Wscript.Echo "Just created " & strDirectory & strFile
+End If 
+
+set objFile = nothing
+set objFolder = nothing
+' OpenTextFile Method needs a Const value
+' ForAppending = 8 ForReading = 1, ForWriting = 2
+Const ForWriting = 2
+
+Set objTextFile = objFSO.OpenTextFile(strDirectory & strFile, ForWriting, True)
+
+' Writes strText 
+objTextFile.Write(strText)
+objTextFile.Close
+
+
+' Bonus or cosmetic section to launch explorer to check file
+'If err.number = vbEmpty then
+''   Set objShell = CreateObject("WScript.Shell")
+'   objShell.run ("Explorer" & " " & strDirectory & "\" )
+'Else WScript.echo "VBScript Error: " & err.number
+'End If
+
+'WScript.Quit
+
+' End of VBScript to write to a file with error-correcting Code
+
+End Function
+
+'----------------------------------------------------------------------------
+</script>
+<!--------------------  End VB Script ---------------------------------------->
+
+</HEAD>    <!-- End Head Section -->
+
+<BODY >   <!-- Body Section Beginning -->
+ 
+<form id=form1> 
+
+<div  style="position: absolute; left:20px;width: 400px; height: 250px; overflow:scroll; ">
+List Table
+<table id = "myTable" border=1 style="position: relative; width: 300px;" >
+<tr>
+<td>
+<input  type="text" width=20% name="c1Val" ></input>
+</td>
+
+<td>
+<input type="text" width=20%  name="c2Val" ></input>
+</td>
+
+<td>
+<input type="button" width=20% name="addRow"  onClick="insRow(this.form);" value="Add Row">
+</input>
+</td>
+</tr>
+</table>
+</div>
+
+
+<!-- Java Sort Button -->
+<div style="position: absolute; left:438px; top:70px;"> 
+<input type="button" id="javaSort" name="javaSort"  value="Java Sort" onClick="JAVASort();"  >
+</input>
+</div>
+
+<!-- VB Sort Button -->
+<div style="position: absolute; left:450px; top:125px;">
+<input type="button" id="vbSort" name="vbSort"  value="VB Sort" 
+onClick="VBSort();" >
+</input>
+</div>
+
+<!-- Clear Sort Button -->
+<div style="position: absolute; left:440px; top:180px;">
+<input type="button" id="clearSort" name="clearSort"  value="Clear Sort" onClick="
+          jvClearSort();" >
+</input>
+</div>
+
+
+<!-- Initialize Sort Button -->
+<div style="position: absolute; left:430px; top:235px;">
+<input type="button" id="initSort" name="initSort"  value="Initialize Sort" onClick="jvInitSort();" >
+</input>
+</div>
+
+<!-- Sorted List Table div -->
+<div style="position: absolute; left: 575px; top: 20px;width: 350; overflow:scroll;">
+<p id="sortedTableListTitle">Sorted Table List</p>
+<table id = "sortListTable" border=1 style="position: relative; right:5px;width: 330px;">
+<tr >
+<td  >
+<input type="text"  ></input>
+</td>
+
+<td >
+<input type="text"  ></input>
+</td>
+</table> 
+
+</tr>
+</div>
+
+
+<!-- XML View div -->
+<div  style="position: absolute; left:20px;top: 325px;width: 350px; height: 250px;">
+XML View
+<div id="xmlView" style="border:2px solid rgb(0, 0, 0); position: relative; width: 300px; height: 225px;overflow:scroll; ">
+</div>
+</div>
+
+
+<!-- XML Sort View div -->
+<div  style="position: absolute; left:575px;top: 325px;width: 350px; height: 250px; ">
+XML Sort View
+<div id="xmlSortView" style="border:2px solid rgb(0, 0, 0); position: relative; width: 300px; height: 225px; overflow:scroll;">
+
+</div>
+</div>
+
+<!-- Create XML Button -->
+<div style="position: absolute; left:180px; top:290px;">
+<input type="button" id="createXML" name="createXML"  value="CreateXML" 
+onClick="xmlView();">
+</input>
+</div>
+
+<!-- XML Sort Button -->
+<div style="position: absolute; left:450px; top:425px;">
+<input type="button" id="xmlSort" name="xmlSort"  value="XML Sort" onClick="xml_Sort();" >
+</input>
+</div>
+</form>
+
+
+<!-- Java Script Global Variables -->
+<script type="text/javascript">
+var nRows = 0;
+var ctRows = 1;
+var cell1 = 0;
+var cell2 = 0;
+
+var col1 = new Array(50);
+var col2 = new Array(50);
+var tCell = new Array(2);
+var tRows = new Array(50);
+var txRows = new Array(50);
+var txCells = new Array(2);
+var cell1Names = new Array(50);
+var cell2Names = new Array(50);
+var cell3Names = new Array(50);
+var cell4Names = new Array(50);
+var xmlViewText = new Array(50);
+var sl1CellNames = new Array(50);
+var sl2CellNames = new Array(50);
+var txt="";
+var xmlSortText = "";
+var createXML = "false";
+var java_Sort = "false";
+var vb_Sort = "false";
+var lnRows = 0;
+var xmlText = "";
+var fileDir = "\\";
+var xslFileName;
+var xmlFileName;
+</script>
+
+
+
+
+
+</BODY>  
+
+</HTML>

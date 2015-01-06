@@ -1,0 +1,158 @@
+<!-- Accepts URL to RSS feed and sends it to file xmlRss2.php on server which 
+constructs a PDF file of the feed-->
+
+
+<html>
+<head>
+<title>RSS to PDF Program</title>
+<style>
+h1 {position:relative;top:10%;text-align:center;font-size:40px;float:clear;}
+
+div#outrdiv {position:absolute;top:20%;left:20%;height:auto;width:700px;background-color:yellow;padding:10px;border:2px solid black;text-align:center}
+#inbox {position:relative;width:450px;top:20%;height:35px;float:left;left:10px;font-size:15px;text-align:left}
+#sub {position:relative;width:225px;top:20%;height:35px;float:left;left:17px;font-size:20px;}
+#indiv {position:relative}
+#showdiv {position:relative;display:none;float:left;height:120px;width:700px;background-color:white;margin-top:10px;border:2px solid black right bottom;text-align:center;font-size:15px;overflow-y:scroll}
+#plink {position:absolute;top:50%;float:left;left:20%;font-size:30px}
+</style>
+
+<script>
+
+function clearRSS()
+{
+       var inp = document.getElementById("inbox").value;
+	
+		 if(inp.search("Input a XML") != null)
+			document.getElementById("inbox").value = "";
+			
+	
+		
+	}   
+
+
+function valInput()
+{
+	var inp = document.getElementById("inbox").value;
+	
+	var inpU = inp.toUpperCase();
+	var checkIn = inpU.search("RSS");
+	if(checkIn == -1)
+		{
+	    clearRSS();
+	    document.getElementById("inbox").value = "Please Input Valid URL for a XML/RSS site"; 
+		} 
+	else if(checkIn != -1)
+		{
+		 var rssURL = inp;
+		 var file = "xmlRss2.php";
+		   // Ajax xmlRss2.php
+		MakeRequest(file,rssURL,"showdiv");
+		
+		}
+		
+    
+}
+
+
+function MakeRequest(file,val,rec)
+{
+
+
+  var xmlHttp = getXMLHttp();
+  xmlHttp.onreadystatechange = function()
+  {
+    if(xmlHttp.readyState == 4)
+    {
+	  el = document.getElementById(rec);
+	  el.style.display = "block";
+      el.innerHTML = xmlHttp.responseText;
+	
+    }
+	
+
+  }
+  val2 = encodeURIComponent(val);
+  var parameters = "rssURL="+val2;
+  xmlHttp.open("POST",file, false);
+  xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+  xmlHttp.send(parameters)
+}
+
+
+
+
+function getXMLHttp()
+{
+  var xmlHttp;
+
+  try
+  {
+    //Firefox, Opera 8.0+, Safari
+    xmlHttp = new XMLHttpRequest();
+  }
+  catch(e)
+  {
+    //Internet Explorer
+    try
+    {
+      xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+    }
+    catch(e)
+    {
+      try
+      {
+        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+      catch(e)
+      {
+        alert("Your browser does not support AJAX!")
+        return false;
+      }
+    }
+  }
+  return xmlHttp;
+}
+
+function ajaxRequest(){
+ var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE
+ if (window.ActiveXObject){ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
+  for (var i=0; i<activexmodes.length; i++){
+   try{
+    return new ActiveXObject(activexmodes[i])
+   }
+   catch(e){
+    //suppress error
+   }
+  }
+ }
+ else if (window.XMLHttpRequest) // if Mozilla, Safari etc
+  return new XMLHttpRequest()
+ else
+  return false
+}
+
+//Sample call:
+//var myajaxrequest=new ajaxRequest()
+
+
+
+
+
+
+</script>
+
+
+</head>
+<body>
+
+<div id="outrdiv">
+<h1>RSS to PDF Conversion Program</h1>
+<div id="indiv">
+<input id="inbox" type="text" name="inbox" value="Input a XML/RSS URL Here" onclick="clearRSS()"><input type="button" id="sub"  value="SUBMIT" onclick="valInput()"/>
+<input id="check" type="hidden" value="no">
+<div id="showdiv"></div>
+</div>
+
+
+</body>
+</html>
